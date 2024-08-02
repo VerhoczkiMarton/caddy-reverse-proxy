@@ -1,4 +1,3 @@
-# global options
 {
     admin off
     persist_config off
@@ -11,40 +10,22 @@
     }
 }
 
-(lb_settings) {
-    lb_policy round_robin
-    lb_retries 100
-    lb_try_duration 10s
-    lb_try_interval 250ms
-}
-
-(passive_health_checks) {
-    fail_duration 60s
-    max_fails 300
-    unhealthy_latency 5s
-    unhealthy_request_count 200
-}
-
 :{$PORT} {
     log {
         format json
     }
 
-    # Handle API requests first
+    # Handle API requests
     handle /api/* {
-        reverse_proxy {
-            to {$BACKEND_DOMAIN}:{$BACKEND_PORT}
-            import lb_settings
-            import passive_health_checks
+        reverse_proxy {$BACKEND_DOMAIN}:{$BACKEND_PORT} {
+            header_up Host {http.reverse_proxy.upstream.hostport}
         }
     }
 
-    # Handle all other requests (frontend)
+    # Handle frontend requests
     handle {
-        reverse_proxy {
-            to {$FRONTEND_DOMAIN}:{$FRONTEND_PORT}
-            import lb_settings
-            import passive_health_checks
+        reverse_proxy {$FRONTEND_DOMAIN}:{$FRONTEND_PORT} {
+            header_up Host {http.reverse_proxy.upstream.hostport}
         }
     }
 }
