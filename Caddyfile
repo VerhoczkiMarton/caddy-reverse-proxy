@@ -24,7 +24,6 @@
 
     # Handle frontend requests
     handle {
-        log
         reverse_proxy {$FRONTEND_DOMAIN}:{$FRONTEND_PORT} {
             header_up Host {http.reverse_proxy.upstream.hostport}
         }
