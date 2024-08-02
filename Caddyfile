@@ -3,7 +3,8 @@
   persist_config off
   auto_https off
   log {
-    format json
+    output stdout
+    level debug
   }
   servers {
     trusted_proxies static private_ranges
@@ -17,7 +18,7 @@
 
   # Handle frontend requests only for testing
   handle {
-    reverse_proxy {$FRONTEND_DOMAIN}:{$FRONTEND_PORT} {
+    reverse_proxy {$FRONTEND_DOMAIN}:5173 {
       header_up Host {http.reverse_proxy.upstream.hostport}
     }
   }
