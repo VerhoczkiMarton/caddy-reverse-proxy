@@ -17,15 +17,23 @@
 
     # Handle API requests
     handle /api/* {
-        reverse_proxy {$BACKEND_DOMAIN}:{$BACKEND_PORT} {
+        reverse_proxy http://{$BACKEND_DOMAIN}:{$BACKEND_PORT} {
             header_up Host {http.reverse_proxy.upstream.hostport}
+            transport http {
+                dial_timeout 5s
+                tls_insecure_skip_verify
+            }
         }
     }
 
     # Handle frontend requests
     handle {
-        reverse_proxy {$FRONTEND_DOMAIN}:{$FRONTEND_PORT} {
+        reverse_proxy http://{$FRONTEND_DOMAIN}:{$FRONTEND_PORT} {
             header_up Host {http.reverse_proxy.upstream.hostport}
+            transport http {
+                dial_timeout 5s
+                tls_insecure_skip_verify
+            }
         }
     }
 }
